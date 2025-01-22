@@ -255,7 +255,46 @@ const verifyOtpAndSetPassword = async (req, res) => {
 
 }
 
-
+const updateInfo = async (req, res) => {
+    try {
+      const userId = req.user.id; // Extract user ID from token
+      const { fName, lName, number, email } = req.body;
+  
+      // Validate input data
+      if (!fName || !lName || !number || !email) {
+        return res.status(400).json({
+          success: false,
+          message: "All fields (fName, lName, number, email) are required!",
+        });
+      }
+  
+      // Update user info
+      const updatedInfo = await userModel.findByIdAndUpdate(
+        userId,
+        { fName, lName, number, email },
+        { new: true, runValidators: true }
+      );
+  
+      if (!updatedInfo) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found!",
+        });
+      }
+  
+      res.status(200).json({
+        success: true,
+        message: "User information updated successfully!",
+        data: updatedInfo,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        success: false,
+        message: "Error updating user information.",
+      });
+    }
+  };
 
 
 
@@ -263,5 +302,6 @@ module.exports = {
     createUser,
     loginUser,
     forgotPassword,
-    verifyOtpAndSetPassword
+    verifyOtpAndSetPassword,
+    updateInfo
 }
